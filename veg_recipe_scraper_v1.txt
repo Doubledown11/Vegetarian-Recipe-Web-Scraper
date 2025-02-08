@@ -24,6 +24,7 @@ NOTES:
     * Later will attempt to generate another GET request on the given URL to try and gather values directly.
 
 """
+from random import choice
 
 import requests
 import random
@@ -171,13 +172,19 @@ def get_cuisines(data):
 
 
 def get_ingredient_id(data):
-    """ Finds and returns the ingredient ID of each ingredient for each recipe."""
+    """
+    Finds and returns the ingredient ID of each ingredient for each recipe.
+    Unable to parse out the ingredient data --> Source has embedded ingredients in a block of text.
+    """
 
     results = data['results']
     ingredient_id = []
 
+    print('data (results) in get_ingredient_id', results)
+
     for x in range(len(results)):
         ingredients_in_recipe = []
+        print('x loop val', results[x])
         for y in range(len(results[x]['analyzedInstructions'])):
             for z in range(len(results[x]['analyzedInstructions'][y]['steps'])):
                 for a in range(len(results[x]['analyzedInstructions'][y]['steps'][z]['ingredients'])):
@@ -196,10 +203,18 @@ def get_ingredient_id(data):
 
 
 def get_instructions(data):
-    """Returns all instructions for each recipe returned."""
+    """
+    Returns all instructions for each recipe returned.
+
+    Note:
+        No instructions included with the JSON data
+        Could link user back to source page.
+    """
 
     results = data['results']
     instructions = []
+
+    print('results in get_instructions', results)
 
     for x in range(len(results)):
         for y in range(len(results[x]['analyzedInstructions'])):
@@ -254,7 +269,6 @@ def get_occasions(data):
             occasions.append(['NULL'])
         else:
             occasions.append([results[x]['occasions']])
-
     return occasions
 
 
@@ -369,8 +383,8 @@ def get_recipe_origin(data):
     origins = []
 
     for x in range(len(results)):
-        if results[x]['sourceName'] not in origins:
-            origins.append(results[x]['sourceName'])
+        if results[x]['sourceUrl'] not in origins:
+            origins.append(results[x]['sourceUrl'])
         else:
             continue
 
@@ -659,135 +673,226 @@ def main():
 
     params = {'apiKey':api_key, 'diet':diet, 'addRecipeInformation':True}
 
-    data = requests.get(url, params=params)
-    if data.status_code == 200:
-        data = data.json()
-    elif data.status_code == 402:
-        print('You are out of free withdrawals from the Spoontacular API!')
-    else:
-        print(data.status_code)
+    # data = requests.get(url, params=params)
+    # if data.status_code == 200:
+    #     data = data.json()
+    # elif data.status_code == 402:
+    #     print('You are out of free withdrawals from the Spoontacular API!')
+    # else:
+    #     print(data.status_code)
 
+    data = {'results': [{'vegetarian': True, 'vegan': True, 'glutenFree': True, 'dairyFree': True, 'veryHealthy': True, 'cheap': False, 'veryPopular': False, 'sustainable': False, 'lowFodmap': False, 'weightWatcherSmartPoints': 2, 'gaps': 'GAPS_4', 'preparationMinutes': None, 'cookingMinutes': None, 'aggregateLikes': 207, 'healthScore': 100, 'creditsText': 'Full Belly Sisters', 'license': 'CC BY-SA 3.0', 'sourceName': 'Full Belly Sisters', 'pricePerServing': 178.37, 'id': 716406, 'title': 'Asparagus and Pea Soup: Real Convenience Food', 'readyInMinutes': 20, 'servings': 2, 'sourceUrl': 'https://fullbellysisters.blogspot.com/2011/03/asparagus-and-pea-soup-real-convenience.html', 'image': 'https://img.spoonacular.com/recipes/716406-312x231.jpg', 'imageType': 'jpg', 'summary': 'Asparagus and Pea Soup: Real Convenience Food requires approximately <b>20 minutes</b> from start to finish. Watching your figure? This gluten free, dairy free, paleolithic, and lacto ovo vegetarian recipe has <b>217 calories</b>, <b>11g of protein</b>, and <b>8g of fat</b> per serving. This recipe serves 2. For <b>$1.78 per serving</b>, this recipe <b>covers 25%</b> of your daily requirements of vitamins and minerals. <b>Autumn</b> will be even more special with this recipe. It works well as a hor d\'oeuvre. 207 people have tried and liked this recipe. It is brought to you by fullbellysisters.blogspot.com. A mixture of vegetable broth, evoo, garlic, and a handful of other ingredients are all it takes to make this recipe so yummy. All things considered, we decided this recipe <b>deserves a spoonacular score of 96%</b>. This score is outstanding. Try <a href="https://spoonacular.com/recipes/asparagus-and-pea-soup-real-convenience-food-1393979">Asparagus and Pea Soup: Real Convenience Food</a>, <a href="https://spoonacular.com/recipes/asparagus-and-pea-soup-real-convenience-food-1376201">Asparagus and Pea Soup: Real Convenience Food</a>, and <a href="https://spoonacular.com/recipes/asparagus-and-pea-soup-real-convenience-food-1362341">Asparagus and Pea Soup: Real Convenience Food</a> for similar recipes.', 'cuisines': [], 'dishTypes': ['soup', 'antipasti', 'starter', 'snack', 'appetizer', 'antipasto', "hor d'oeuvre"], 'diets': ['gluten free', 'dairy free', 'paleolithic', 'lacto ovo vegetarian', 'primal', 'vegan'], 'occasions': ['fall', 'winter'], 'spoonacularScore': 99.41638946533203, 'spoonacularSourceUrl': 'https://spoonacular.com/asparagus-and-pea-soup-real-convenience-food-716406'}, {'vegetarian': True, 'vegan': True, 'glutenFree': True, 'dairyFree': True, 'veryHealthy': True, 'cheap': False, 'veryPopular': False, 'sustainable': False, 'lowFodmap': False, 'weightWatcherSmartPoints': 5, 'gaps': 'no', 'preparationMinutes': None, 'cookingMinutes': None, 'aggregateLikes': 19, 'healthScore': 83, 'creditsText': 'Foodista.com – The Cooking Encyclopedia Everyone Can Edit', 'license': 'CC BY 3.0', 'sourceName': 'Foodista', 'pricePerServing': 69.09, 'id': 644387, 'title': 'Garlicky Kale', 'readyInMinutes': 45, 'servings': 2, 'sourceUrl': 'https://www.foodista.com/recipe/J2FTJBF7/garlicky-kale', 'image': 'https://img.spoonacular.com/recipes/644387-312x231.jpg', 'imageType': 'jpg', 'summary': 'Garlicky Kale requires approximately <b>45 minutes</b> from start to finish. This side dish has <b>170 calories</b>, <b>2g of protein</b>, and <b>15g of fat</b> per serving. This recipe serves 2. For <b>69 cents per serving</b>, this recipe <b>covers 17%</b> of your daily requirements of vitamins and minerals. 19 people have made this recipe and would make it again. This recipe from Foodista requires balsamic vinegar, garlic, curly kale, and olive oil. It is a good option if you\'re following a <b>gluten free, dairy free, paleolithic, and lacto ovo vegetarian</b> diet. With a spoonacular <b>score of 99%</b>, this dish is outstanding. Try <a href="https://spoonacular.com/recipes/garlicky-kale-248759">Garlicky Kale</a>, <a href="https://spoonacular.com/recipes/garlicky-kale-1267347">Garlicky Kale</a>, and <a href="https://spoonacular.com/recipes/garlicky-kale-1584523">Garlicky Kale</a> for similar recipes.', 'cuisines': [], 'dishTypes': ['side dish'], 'diets': ['gluten free', 'dairy free', 'paleolithic', 'lacto ovo vegetarian', 'primal', 'whole 30', 'vegan'], 'occasions': [], 'spoonacularScore': 98.941650390625, 'spoonacularSourceUrl': 'https://spoonacular.com/garlicky-kale-644387'}, {'vegetarian': True, 'vegan': True, 'glutenFree': True, 'dairyFree': True, 'veryHealthy': True, 'cheap': False, 'veryPopular': False, 'sustainable': False, 'lowFodmap': False, 'weightWatcherSmartPoints': 9, 'gaps': 'no', 'preparationMinutes': None, 'cookingMinutes': None, 'aggregateLikes': 53, 'healthScore': 96, 'creditsText': 'foodandspice.com', 'sourceName': 'foodandspice.com', 'pricePerServing': 168.43, 'id': 782601, 'title': 'Red Kidney Bean Jambalaya', 'readyInMinutes': 45, 'servings': 6, 'sourceUrl': 'https://www.foodandspice.com/2016/05/red-kidney-bean-jambalaya.html', 'image': 'https://img.spoonacular.com/recipes/782601-312x231.jpg', 'imageType': 'jpg', 'summary': 'Red Kidney Bean Jambalayan is a main course that serves 6. One portion of this dish contains approximately <b>18g of protein</b>, <b>6g of fat</b>, and a total of <b>393 calories</b>. For <b>$1.68 per serving</b>, this recipe <b>covers 33%</b> of your daily requirements of vitamins and minerals. 53 people were glad they tried this recipe. A mixture of vegetable stock, tomatoes, onion, and a handful of other ingredients are all it takes to make this recipe so flavorful. It is a good option if you\'re following a <b>gluten free, dairy free, lacto ovo vegetarian, and vegan</b> diet. This recipe is typical of Cajun cuisine. It is brought to you by foodandspice.blogspot.com. From preparation to the plate, this recipe takes roughly <b>45 minutes</b>. Overall, this recipe earns a <b>tremendous spoonacular score of 99%</b>. Users who liked this recipe also liked <a href="https://spoonacular.com/recipes/red-kidney-bean-jambalaya-1407231">Red Kidney Bean Jambalaya</a>, <a href="https://spoonacular.com/recipes/red-kidney-bean-salad-94525">Red Kidney Bean Salad</a>, and <a href="https://spoonacular.com/recipes/red-kidney-bean-curry-80686">Red Kidney Bean Curry</a>.', 'cuisines': ['Cajun', 'Creole'], 'dishTypes': ['lunch', 'main course', 'main dish', 'dinner'], 'diets': ['gluten free', 'dairy free', 'lacto ovo vegetarian', 'vegan'], 'occasions': [], 'spoonacularScore': 98.81664276123047, 'spoonacularSourceUrl': 'https://spoonacular.com/red-kidney-bean-jambalaya-782601'}, {'vegetarian': True, 'vegan': True, 'glutenFree': True, 'dairyFree': True, 'veryHealthy': False, 'cheap': False, 'veryPopular': True, 'sustainable': False, 'lowFodmap': False, 'weightWatcherSmartPoints': 7, 'gaps': 'no', 'preparationMinutes': 15, 'cookingMinutes': 15, 'aggregateLikes': 3689, 'healthScore': 51, 'creditsText': 'Full Belly Sisters', 'license': 'CC BY-SA 3.0', 'sourceName': 'Full Belly Sisters', 'pricePerServing': 119.36, 'id': 716426, 'title': 'Cauliflower, Brown Rice, and Vegetable Fried Rice', 'readyInMinutes': 30, 'servings': 8, 'sourceUrl': 'https://fullbellysisters.blogspot.com/2012/01/cauliflower-fried-rice-more-veggies.html', 'image': 'https://img.spoonacular.com/recipes/716426-312x231.jpg', 'imageType': 'jpg', 'summary': 'The recipe Cauliflower, Brown Rice, and Vegetable Fried Rice is ready <b>in around 30 minutes</b> and is definitely a great <b>gluten free, dairy free, lacto ovo vegetarian, and vegan</b> option for lovers of Chinese food. This recipe makes 8 servings with <b>248 calories</b>, <b>7g of protein</b>, and <b>13g of fat</b> each. For <b>$1.19 per serving</b>, this recipe <b>covers 19%</b> of your daily requirements of vitamins and minerals. It works well as a hor d\'oeuvre. 3689 people have made this recipe and would make it again. It is brought to you by fullbellysisters.blogspot.com. Head to the store and pick up broccoli, t grapeseed oil, sesame seeds, and a few other things to make it today. With a spoonacular <b>score of 100%</b>, this dish is amazing. <a href="https://spoonacular.com/recipes/cauliflower-brown-rice-and-vegetable-fried-rice-1230097">Cauliflower, Brown Rice, and Vegetable Fried Rice</a>, <a href="https://spoonacular.com/recipes/cauliflower-brown-rice-and-vegetable-fried-rice-1238897">Cauliflower, Brown Rice, and Vegetable Fried Rice</a>, and <a href="https://spoonacular.com/recipes/cauliflower-brown-rice-and-vegetable-fried-rice-1403527">Cauliflower, Brown Rice, and Vegetable Fried Rice</a> are very similar to this recipe.', 'cuisines': ['Chinese', 'Asian'], 'dishTypes': ['side dish', 'antipasti', 'starter', 'snack', 'appetizer', 'antipasto', "hor d'oeuvre"], 'diets': ['gluten free', 'dairy free', 'lacto ovo vegetarian', 'vegan'], 'occasions': [], 'spoonacularScore': 98.71421813964844, 'spoonacularSourceUrl': 'https://spoonacular.com/cauliflower-brown-rice-and-vegetable-fried-rice-716426'}, {'vegetarian': True, 'vegan': False, 'glutenFree': True, 'dairyFree': True, 'veryHealthy': True, 'cheap': False, 'veryPopular': False, 'sustainable': False, 'lowFodmap': False, 'weightWatcherSmartPoints': 14, 'gaps': 'no', 'preparationMinutes': None, 'cookingMinutes': None, 'aggregateLikes': 34, 'healthScore': 100, 'creditsText': 'foodandspice.com', 'sourceName': 'foodandspice.com', 'pricePerServing': 186.91, 'id': 716004, 'title': 'Quinoa and Chickpea Salad with Sun-Dried Tomatoes and Dried Cherries', 'readyInMinutes': 45, 'servings': 6, 'sourceUrl': 'https://www.foodandspice.com/2016/01/quinoa-and-chickpea-salad-with-sun.html', 'image': 'https://img.spoonacular.com/recipes/716004-312x231.jpg', 'imageType': 'jpg', 'summary': 'Need a <b>gluten free, dairy free, and vegetarian side dish</b>? Quinoan and Chickpea Salad with Sun-Dried Tomatoes and Dried Cherries could be an awesome recipe to try. This recipe serves 6 and costs $1.87 per serving. One serving contains <b>539 calories</b>, <b>21g of protein</b>, and <b>15g of fat</b>. 34 people have made this recipe and would make it again. Head to the store and pick up honey, juice of orange, chickpeas, and a few other things to make it today. From preparation to the plate, this recipe takes about <b>45 minutes</b>. It is brought to you by foodandspice.blogspot.com. Taking all factors into account, this recipe <b>earns a spoonacular score of 99%</b>, which is spectacular. <a href="https://spoonacular.com/recipes/chickpea-and-cucumber-salad-with-dried-cherries-and-cheese-506468">Chickpean and Cucumber Salad with Dried Cherries and Cheese</a>, <a href="https://spoonacular.com/recipes/spinach-quiche-with-sun-dried-tomatoes-923350">Spinach Quiche with Sun-Dried Tomatoes</a>, and <a href="https://spoonacular.com/recipes/quinoa-salad-with-dried-tart-cherries-mint-and-feta-in-lemon-sumac-vinaigrette-605087">Quinoa Salad With Dried Tart Cherries, Mint, and Fetan in Lemon-Sumac Vinaigrette</a> are very similar to this recipe.', 'cuisines': [], 'dishTypes': ['lunch', 'main course', 'main dish', 'dinner'], 'diets': ['gluten free', 'dairy free', 'lacto ovo vegetarian'], 'occasions': [], 'spoonacularScore': 98.62732696533203, 'spoonacularSourceUrl': 'https://spoonacular.com/quinoa-and-chickpea-salad-with-sun-dried-tomatoes-and-dried-cherries-716004'}, {'vegetarian': True, 'vegan': True, 'glutenFree': True, 'dairyFree': True, 'veryHealthy': True, 'cheap': False, 'veryPopular': True, 'sustainable': False, 'lowFodmap': False, 'weightWatcherSmartPoints': 10, 'gaps': 'no', 'preparationMinutes': None, 'cookingMinutes': None, 'aggregateLikes': 471, 'healthScore': 60, 'creditsText': 'blogspot.com', 'sourceName': 'blogspot.com', 'pricePerServing': 106.02, 'id': 716627, 'title': 'Easy Homemade Rice and Beans', 'readyInMinutes': 35, 'servings': 2, 'sourceUrl': 'http://cooking2perfection.blogspot.com/2012/11/easy-homemade-rice-and-beans.html', 'image': 'https://img.spoonacular.com/recipes/716627-312x231.jpg', 'imageType': 'jpg', 'summary': 'Easy Homemade Rice and Beans is a main course that serves 2. One serving contains <b>446 calories</b>, <b>19g of protein</b>, and <b>4g of fat</b>. For <b>$1.06 per serving</b>, this recipe <b>covers 26%</b> of your daily requirements of vitamins and minerals. A mixture of optional: of hot sauce, canned tomatoes, water, and a handful of other ingredients are all it takes to make this recipe so yummy. This recipe from cooking2perfection.blogspot.com has 471 fans. It is a good option if you\'re following a <b>gluten free, dairy free, lacto ovo vegetarian, and vegan</b> diet. From preparation to the plate, this recipe takes around <b>35 minutes</b>. Overall, this recipe earns a <b>tremendous spoonacular score of 98%</b>. <a href="https://spoonacular.com/recipes/easy-homemade-rice-and-beans-1311839">Easy Homemade Rice and Beans</a>, <a href="https://spoonacular.com/recipes/easy-homemade-rice-and-beans-1303021">Easy Homemade Rice and Beans</a>, and <a href="https://spoonacular.com/recipes/easy-homemade-rice-and-beans-1230117">Easy Homemade Rice and Beans</a> are very similar to this recipe.', 'cuisines': [], 'dishTypes': ['side dish', 'lunch', 'main course', 'main dish', 'dinner'], 'diets': ['gluten free', 'dairy free', 'lacto ovo vegetarian', 'vegan'], 'occasions': [], 'spoonacularScore': 98.62263488769531, 'spoonacularSourceUrl': 'https://spoonacular.com/easy-homemade-rice-and-beans-716627'}, {'vegetarian': True, 'vegan': True, 'glutenFree': True, 'dairyFree': True, 'veryHealthy': True, 'cheap': False, 'veryPopular': False, 'sustainable': False, 'lowFodmap': False, 'weightWatcherSmartPoints': 6, 'gaps': 'no', 'preparationMinutes': None, 'cookingMinutes': None, 'aggregateLikes': 22, 'healthScore': 94, 'creditsText': 'foodista.com', 'sourceName': 'foodista.com', 'pricePerServing': 49.7, 'id': 664147, 'title': 'Tuscan White Bean Soup with Olive Oil and Rosemary', 'readyInMinutes': 45, 'servings': 6, 'sourceUrl': 'https://www.foodista.com/recipe/HPKTNKY5/tuscan-white-bean-soup-with-olive-oil-and-rosemary', 'image': 'https://img.spoonacular.com/recipes/664147-312x231.jpg', 'imageType': 'jpg', 'summary': 'Tuscan White Bean Soup with Olive Oil and Rosemary is a <b>gluten free, dairy free, lacto ovo vegetarian, and vegan</b> recipe with 6 servings. This main course has <b>242 calories</b>, <b>16g of protein</b>, and <b>1g of fat</b> per serving. For <b>50 cents per serving</b>, this recipe <b>covers 19%</b> of your daily requirements of vitamins and minerals. It will be a hit at your <b>Autumn</b> event. 22 people found this recipe to be tasty and satisfying. Head to the store and pick up olive oil, rosemary, garlic, and a few other things to make it today. It is brought to you by Foodista. From preparation to the plate, this recipe takes roughly <b>45 minutes</b>. With a spoonacular <b>score of 79%</b>, this dish is good. If you like this recipe, take a look at these similar recipes: <a href="https://spoonacular.com/recipes/white-bean-soup-with-pasta-and-rosemary-oil-drizzle-855454">White Bean Soup with Pastan and Rosemary Oil Drizzle</a>, <a href="https://spoonacular.com/recipes/tuscan-white-bean-and-fennel-stew-with-orange-and-rosemary-105383">Tuscan White Bean and Fennel Stew With Orange and Rosemary</a>, and <a href="https://spoonacular.com/recipes/tuscan-white-bean-soup-1054940">Tuscan White Bean Soup</a>.', 'cuisines': [], 'dishTypes': ['soup', 'lunch', 'main course', 'main dish', 'dinner'], 'diets': ['gluten free', 'dairy free', 'lacto ovo vegetarian', 'vegan'], 'occasions': ['fall', 'winter'], 'spoonacularScore': 98.55166625976562, 'spoonacularSourceUrl': 'https://spoonacular.com/tuscan-white-bean-soup-with-olive-oil-and-rosemary-664147'}, {'vegetarian': True, 'vegan': False, 'glutenFree': True, 'dairyFree': True, 'veryHealthy': True, 'cheap': False, 'veryPopular': False, 'sustainable': False, 'lowFodmap': False, 'weightWatcherSmartPoints': 4, 'gaps': 'no', 'preparationMinutes': None, 'cookingMinutes': None, 'aggregateLikes': 26, 'healthScore': 100, 'creditsText': 'Foodista.com – The Cooking Encyclopedia Everyone Can Edit', 'license': 'CC BY 3.0', 'sourceName': 'Foodista', 'pricePerServing': 169.38, 'id': 640941, 'title': 'Crunchy Brussels Sprouts Side Dish', 'readyInMinutes': 30, 'servings': 4, 'sourceUrl': 'https://www.foodista.com/recipe/LKJMG5RP/crunchy-brussels-sprouts', 'image': 'https://img.spoonacular.com/recipes/640941-312x231.jpg', 'imageType': 'jpg', 'summary': 'The recipe Crunchy Brussels Sprouts Side Dish can be made <b>in about 30 minutes</b>. For <b>$1.69 per serving</b>, you get a side dish that serves 4. One serving contains <b>232 calories</b>, <b>8g of protein</b>, and <b>16g of fat</b>. This recipe is liked by 26 foodies and cooks. It is brought to you by Foodista. A mixture of red wine vinegar, walnuts, dijon mustard, and a handful of other ingredients are all it takes to make this recipe so yummy. It is a good option if you\'re following a <b>gluten free, dairy free, paleolithic, and lacto ovo vegetarian</b> diet. All things considered, we decided this recipe <b>deserves a spoonacular score of 98%</b>. This score is spectacular. Similar recipes include <a href="https://spoonacular.com/recipes/side-dish-sundays-cacio-e-pepe-brussels-sprouts-1146819">Side Dish Sundays: Cacio e Pepe Brussels Sprouts</a>, <a href="https://spoonacular.com/recipes/easy-side-dish-roasted-brussels-sprouts-and-grapes-474168">Easy Side Dish – Roasted Brussels Sprouts and Grapes</a>, and <a href="https://spoonacular.com/recipes/side-dish-sundays-cacio-e-pepe-brussels-sprouts-1385177">Side Dish Sundays: Cacio e Pepe Brussels Sprouts</a>.', 'cuisines': [], 'dishTypes': ['side dish'], 'diets': ['gluten free', 'dairy free', 'paleolithic', 'lacto ovo vegetarian', 'primal'], 'occasions': [], 'spoonacularScore': 98.45503234863281, 'spoonacularSourceUrl': 'https://spoonacular.com/crunchy-brussels-sprouts-side-dish-640941'}, {'vegetarian': True, 'vegan': True, 'glutenFree': True, 'dairyFree': True, 'veryHealthy': True, 'cheap': False, 'veryPopular': False, 'sustainable': False, 'lowFodmap': False, 'weightWatcherSmartPoints': 17, 'gaps': 'no', 'preparationMinutes': None, 'cookingMinutes': None, 'aggregateLikes': 94, 'healthScore': 74, 'creditsText': 'pickfreshfoods.com', 'sourceName': 'pickfreshfoods.com', 'pricePerServing': 414.24, 'id': 715769, 'title': 'Broccolini Quinoa Pilaf', 'readyInMinutes': 30, 'servings': 2, 'sourceUrl': 'https://pickfreshfoods.com/broccolini-quinoa-pilaf/', 'image': 'https://img.spoonacular.com/recipes/715769-312x231.jpg', 'imageType': 'jpg', 'summary': 'Broccolini Quinoa Pilaf requires approximately <b>30 minutes</b> from start to finish. For <b>$4.14 per serving</b>, you get a main course that serves 2. One portion of this dish contains around <b>20g of protein</b>, <b>31g of fat</b>, and a total of <b>625 calories</b>. Head to the store and pick up vegetable broth, onion, olive oil, and a few other things to make it today. A few people made this recipe, and 94 would say it hit the spot. It is a <b>rather expensive</b> recipe for fans of Mediterranean food. It is a good option if you\'re following a <b>gluten free, dairy free, lacto ovo vegetarian, and vegan</b> diet. It is brought to you by Pick Fresh Foods. With a spoonacular <b>score of 98%</b>, this dish is excellent. Similar recipes are <a href="https://spoonacular.com/recipes/spring-broccolini-kale-quinoa-bowls-734866">Spring Broccolini & Kale Quinoa Bowls</a>, <a href="https://spoonacular.com/recipes/orange-sesame-salmon-with-quinoa-broccolini-839832">Orange-Sesame Salmon with Quinoa & Broccolini</a>, and <a href="https://spoonacular.com/recipes/black-pepper-goat-cheese-and-chard-quinoa-with-roasted-broccolini-625829">Black Pepper Goat Cheese and Chard Quinoa with Roasted Broccolini</a>.', 'cuisines': ['Mediterranean', 'Italian', 'European'], 'dishTypes': ['side dish', 'lunch', 'main course', 'main dish', 'dinner'], 'diets': ['gluten free', 'dairy free', 'lacto ovo vegetarian', 'vegan'], 'occasions': [], 'spoonacularScore': 98.09086608886719, 'spoonacularSourceUrl': 'https://spoonacular.com/broccolini-quinoa-pilaf-715769'}, {'vegetarian': True, 'vegan': False, 'glutenFree': False, 'dairyFree': True, 'veryHealthy': True, 'cheap': False, 'veryPopular': False, 'sustainable': False, 'lowFodmap': False, 'weightWatcherSmartPoints': 10, 'gaps': 'no', 'preparationMinutes': None, 'cookingMinutes': None, 'aggregateLikes': 47, 'healthScore': 80, 'creditsText': 'Foodista.com – The Cooking Encyclopedia Everyone Can Edit', 'license': 'CC BY 3.0', 'sourceName': 'Foodista', 'pricePerServing': 394.03, 'id': 642605, 'title': 'Farro With Mushrooms and Asparagus', 'readyInMinutes': 75, 'servings': 4, 'sourceUrl': 'https://www.foodista.com/recipe/DMV5G8FD/farro-with-mushrooms-and-asparagus', 'image': 'https://img.spoonacular.com/recipes/642605-312x231.jpg', 'imageType': 'jpg', 'summary': 'Farro With Mushrooms and Asparagus is a <b>dairy free and lacto ovo vegetarian</b> recipe with 4 servings. One serving contains <b>365 calories</b>, <b>12g of protein</b>, and <b>9g of fat</b>. For <b>$3.94 per serving</b>, this recipe <b>covers 23%</b> of your daily requirements of vitamins and minerals. This recipe is liked by 47 foodies and cooks. From preparation to the plate, this recipe takes around <b>1 hour and 15 minutes</b>. It works well as a side dish. If you have asparagus, garlic, porcini mushrooms, and a few other ingredients on hand, you can make it. It is brought to you by Foodista. With a spoonacular <b>score of 98%</b>, this dish is awesome. If you like this recipe, take a look at these similar recipes: <a href="https://spoonacular.com/recipes/farro-risotto-with-wild-mushrooms-and-asparagus-495316">Farro Risotto with Wild Mushrooms and Asparagus</a>, <a href="https://spoonacular.com/recipes/farro-with-asparagus-hazelnuts-and-kale-topped-with-roasted-mushrooms-298005">Farro with Asparagus, Hazelnuts and Kale Topped with Roasted Mushrooms</a>, and <a href="https://spoonacular.com/recipes/farro-and-porcini-mushrooms-farro-con-funghi-40485">Farro And Porcini Mushrooms (farro Con Funghi)</a>.', 'cuisines': [], 'dishTypes': ['side dish'], 'diets': ['dairy free', 'lacto ovo vegetarian'], 'occasions': [], 'spoonacularScore': 97.87398529052734, 'spoonacularSourceUrl': 'https://spoonacular.com/farro-with-mushrooms-and-asparagus-642605'}], 'offset': 0, 'number': 10, 'totalResults': 2177}
 
+    print('data', data)
 
-################# Recipe Table ##################
+    ################# Recipe Table ##################
     # Recipe ID and Recipe Title:
     title_RecipeID = title_ID(data)
     recipe_title = title_RecipeID[0]
     recipe_ID = title_RecipeID[1]
 
-    # Recipe Description
-    recipe_summary = get_summary(data)
 
-    # Prep time
-    prep = prep_time(data)
+    print('\n\n\n')
+    print('Displaying Recipe Titles Below:\n')
+    ## Print out all recipe titles:
+    for x in range(len(recipe_title)):
+        print(f'Recipe {x}', recipe_title[x])
 
-    # Total Time
-    tot_time = total_time(data)
+    print('\n')
 
-    # Cook time
-    cook_ = cook_time(data)
+    ## Ask user what recipe they would like to view information for.
+    recipe_choice = int(input('What recipe would you like more detail on? Please enter an integer value as displayed above: '))
+    recipe = recipe_title[recipe_choice]
 
-    # Servings
-    recipe_servings = get_servings(data)
+    print('\n\n\n')
+    x = True
+    while x:
+        options = ['Summary', 'Prep Time', 'Total Time', 'Cook Time', 'Number of Servings', 'Cuisines Types',
+                   'Number of Calories', 'Course', 'Occasions', 'Diets', 'Dish Types', 'Cost Per Serving',
+                   'Number of Smart Points', 'Dairy Free?', 'Gluten Free?', 'Vegan?', 'Recipe Origin Website!']
+        print('Displaying Options Below:\n')
+        for y in range(len(options)):
+            print(f'Option {y}', options[y])
+        print('\n')
 
-    # Cuisine
-    cuisines = get_cuisines(data)
+        ## Ask user what information they would like to view on the recipe.
+        choice = int(input('From above list, what piece of information would you like to view for?: '))
+        print('choice == ', choice)
+        print('\n\n\n')
 
-    # Calories
-    cal = calories(data)
+        # Recipe Description
 
-    # Course
-    course = get_course(data)
+        recipe_summary = get_summary(data)
 
-####################################
+        # Prep time
+        prep = prep_time(data)
 
-##### Ingredients Table ##########
+        # Total Time
+        tot_time = total_time(data)
 
-    # Ingredient IDs
-    ingredient_IDs = get_ingredient_id(data)
+        # Cook time
+        cook_ = cook_time(data)
 
-    # Ingredient Names
-    ingredient_names = get_ingredient_names(data)
+        # Servings
+        recipe_servings = get_servings(data)
 
-###################################
+        # Cuisine
+        cuisines = get_cuisines(data)
 
-##### Instructions Table ##########
-# Instructions 'Instruction' attribute:
-    instructions_per_recipe = get_instructions(data)
+        # Calories
+        cal = calories(data)
+
+        # Course
+        course = get_course(data)
+
+    ####################################
+
+    ##### Ingredients Table ##########
+
+        # Ingredient IDs -- Cant parse ingredients from blocks of text as an entry in the JSON dict.
+        #ingredient_IDs = get_ingredient_id(data)
+
+        # Ingredient Names -- Cant parse ingredients from blocks of text as an entry in the JSON dict.
+        # ingredient_names = get_ingredient_names(data)
+
+    ###################################
+
+    ##### Instructions Table ##########
+        # Instructions 'Instruction' attribute:
+        #instructions_per_recipe = get_instructions(data)
+
+    ###################################
+
+    ##### Tags ########################
+    # Occasions Tag
+        occasions = get_occasions(data)
+
+    # Diets Tag
+        diets = get_diets(data)
+
+    # Dish Types Tag
+        dish_types = get_dish_types(data)
+
+    # Cost per servings Tag
+        cost_serving = get_cost_per_serving(data)
+
+    # Weight Watcher's Smart Points Tag
+        smart_points = get_smart_points(data)
+
+    # Dairy Free Tag
+        dairy_free = get_dairy_free(data)
+
+    # Gluten Free Tag
+        gluten_free = get_gluten_free(data)
+
+    # Vegan Tag
+        vegan_tag = get_vegan(data)
+
+    #### Recipe_Origin ############
+    # Recipe Origin Website
+        recipe_origins = get_recipe_origin(data)
+
+        ############################### Display chosen data for user to see ########################
+        results = data['results']
+        print('Recipe Title:', recipe_title[recipe_choice])
+
+        # Determine the recipe data option selected by the user:
+        if choice == 0:
+            print('The recipe summary:', recipe_summary[recipe_choice])
+
+        elif choice == 1:
+            print('The prep time is:', prep[recipe_choice])
+
+        elif choice == 2:
+            print('The total time is:', tot_time[recipe_choice])
+
+        elif choice == 3:
+            print('The cook time is:', cook_[recipe_choice])
+
+        elif choice == 4:
+            print('The number of servings is:', recipe_servings[recipe_choice])
+
+        elif choice == 5:
+            print('The cuisine class is:', cuisines[recipe_choice])
+
+        elif choice == 6:
+            print('The number of calories is:', cal[recipe_choice])
+
+        elif choice == 7:
+            print('The course class is:', course[recipe_choice])
+
+        elif choice == 8:
+            print('The occassions tag(s) are:', occasions[recipe_choice])
+
+        elif choice == 9:
+            print('The diets class(es) are:', diets[recipe_choice])
+
+        elif choice == 10:
+            print('The dish type(s) is:', dish_types[recipe_choice])
+
+        elif choice == 11:
+            print('The cost per serving is:', cost_serving[recipe_choice])
+
+        elif choice == 12:
+            print('The number of smart points is:', smart_points[recipe_choice])
+
+        elif choice == 13:
+            print('Is the meal dairy free?:', dairy_free[recipe_choice])
+
+        elif choice == 14:
+            print('Is the meal gluten free?:', gluten_free[recipe_choice])
+
+        elif choice == 15:
+            print('Is the meal vegan?:', vegan_tag[recipe_choice])
+
+        elif choice == 16:
+            print('The source website is:', recipe_origins[recipe_choice])
 
 
-###################################
-
-##### Tags ########################
-# Occasions Tag
-    occasions = get_occasions(data)
-
-# Diets Tag
-    diets = get_diets(data)
-
-# Dish Types Tag
-    dish_types = get_dish_types(data)
-
-# Cost per servings Tag
-    cost_serving = get_cost_per_serving(data)
-
-# Weight Watcher's Smart Points Tag
-    smart_points = get_smart_points(data)
-
-# Dairy Free Tag
-    dairy_free = get_dairy_free(data)
-
-# Gluten Free Tag
-    gluten_free = get_gluten_free(data)
-
-# Vegan Tag
-    vegan_tag = get_vegan(data)
-
-###############################
-
-#### Recipe_Origin ############
-# Recipe Origin Website
-    recipe_origins = get_recipe_origin(data)
-
-###############################
-
-    # After I have gathered all data needed for filling my database tables,
-    #  I format everything into SQL insert into statements.
-    # Then append those SQL statements to a txt file that is saved on my machine,
-    # and this file can be run in MySQL Server.
-
-
-    # Below while loop verifies that the user input filename is valid.
-    while True:
-        filename = input("What would you like to name the file of which to save the SQL output?: ").capitalize()
-        if type(filename) == str:
-            filename += '.txt'
+        loop = input('Would you like to view any more information on the selected recipe? (y or n):')
+        if loop == 'n' or loop == 'N':
+            print('Goodbye')
+            x = False
             break
-        else:
-            continue
 
+    ###############################
 
-    # Line below calls the function which creates and writes the SQL statements for the Recipes table.
-    recipe_statements(recipe_ID, recipe_title, recipe_summary, prep, cook_, tot_time,
-                      recipe_servings, cuisines, cal, course, filename)
+        # After I have gathered all data needed for filling my database tables,
+        #  I format everything into SQL insert into statements.
+        # Then append those SQL statements to a txt file that is saved on my machine,
+        # and this file can be run in MySQL Server.
 
-    # Line below calls the function which creates and writes the SQL statements for the Ingredients table.
-    ingredient_statements(ingredient_IDs, ingredient_names, filename)
-
-    # Line below calls the function which creates and writes the SQL statements for the Instructions table.
-    instructions_statements(recipe_ID, instructions_per_recipe, filename)
-
-    # Line below calls the function which creates and writes the SQL statements for the Tags table.
-    tags_statements(recipe_ID, occasions, diets, dish_types, cost_serving, smart_points, dairy_free,
-                    gluten_free, vegan_tag, filename)
-
-    # Line below calls the function which creates and writes the SQL statements for the Recipe_Ingredients table.
-    recipe_ingredients_statements(recipe_ID, ingredient_IDs, ingredient_names, filename, data)
-
-    # Line below calls the function which creates and writes the SQL statements for the Recipe_Origin table.
-    recipe_origin_statements(recipe_origins, recipe_ID, filename)
+        #
+        # # Below while loop verifies that the user input filename is valid.
+        # while True:
+        #     filename = input("What would you like to name the file of which to save the SQL output?: ").capitalize()
+        #     if type(filename) == str:
+        #         filename += '.txt'
+        #         break
+        #     else:
+        #         continue
+        #
+        #
+        # # Line below calls the function which creates and writes the SQL statements for the Recipes table.
+        # recipe_statements(recipe_ID, recipe_title, recipe_summary, prep, cook_, tot_time,
+        #                   recipe_servings, cuisines, cal, course, filename)
+        #
+        # # Line below calls the function which creates and writes the SQL statements for the Ingredients table.
+        # ingredient_statements(ingredient_IDs, ingredient_names, filename)
+        #
+        # # Line below calls the function which creates and writes the SQL statements for the Instructions table.
+        # instructions_statements(recipe_ID, instructions_per_recipe, filename)
+        #
+        # # Line below calls the function which creates and writes the SQL statements for the Tags table.
+        # tags_statements(recipe_ID, occasions, diets, dish_types, cost_serving, smart_points, dairy_free,
+        #                 gluten_free, vegan_tag, filename)
+        #
+        # # Line below calls the function which creates and writes the SQL statements for the Recipe_Ingredients table.
+        # recipe_ingredients_statements(recipe_ID, ingredient_IDs, ingredient_names, filename, data)
+        #
+        # # Line below calls the function which creates and writes the SQL statements for the Recipe_Origin table.
+        # recipe_origin_statements(recipe_origins, recipe_ID, filename)
 
 
 if __name__ == '__main__':
     main()
-
